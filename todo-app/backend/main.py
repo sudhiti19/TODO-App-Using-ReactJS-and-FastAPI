@@ -65,6 +65,21 @@ def get_todos():
     conn.close()
     return [{"id": t[0], "task": t[1], "done": t[2]} for t in todos]
 
+# ✅ Update a todo's completion status
+@app.put("/todos/{todo_id}/")
+def update_todo(todo_id: int, todo: ToDo):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE todos SET done = %s WHERE id = %s RETURNING id", (todo.done, todo_id))
+    updated = cursor.fetchone()
+    conn.commit()
+    conn.close()
+
+    if updated is None:
+        raise HTTPException(status_code=404, detail="ToDo not found")
+
+    return {"message": "ToDo updated"}
+
 # ✅ Delete a todo
 @app.delete("/todos/{todo_id}")
 def delete_todo(todo_id: int):

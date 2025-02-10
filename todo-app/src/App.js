@@ -21,7 +21,11 @@ function App() {
         fetchTodos();
         setTask("");
     };
-
+     // ✅ Toggle Task Completion
+     const toggleDone = async (id, done) => {
+        await axios.put(`${API_URL}${id}/`, { done: !done });
+        fetchTodos();  // Refresh after update
+    };
     return (
         <div>
             <h1>To-Do List</h1>
@@ -30,7 +34,14 @@ function App() {
             <ul>
                 {todos.map(todo => (
                     <li key={todo.id}>
-                        {todo.task} 
+                        <input 
+                            type="checkbox" 
+                            checked={todo.done} 
+                            onChange={() => toggleDone(todo.id, todo.done)} 
+                        />
+                        <span style={{ textDecoration: todo.done ? "line-through" : "none" }}>
+                            {todo.task}
+                        </span>
                     </li>
                 ))}
             </ul>
